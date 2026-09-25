@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+
+{% block title %}Buscar Pasajes - Transporte Nacional{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-6">
+
+    <!-- Formulario de Búsqueda -->
+    <div class="bg-white p-6 rounded-2xl shadow-md border border-slate-100 mb-10">
+        <h1 class="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+            <i data-lucide="bus" class="text-blue-600"></i> Reserva tu Viaje
+        </h1>
+        <form action="{{ url_for('pasajeros') }}" method="POST" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Origen</label>
+                <select name="origen" class="w-full border border-slate-300 rounded-xl p-3 focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-700">
+                    <option value="Bogotá" {% if origen == 'Bogotá' %}selected{% endif %}>Bogotá</option>
+                    <option value="Medellín" {% if origen == 'Medellín' %}selected{% endif %}>Medellín</option>
+                    <option value="Cali" {% if origen == 'Cali' %}selected{% endif %}>Cali</option>
+                    <option value="Barranquilla" {% if origen == 'Barranquilla' %}selected{% endif %}>Barranquilla</option>
+                    <option value="Bucaramanga" {% if origen == 'Bucaramanga' %}selected{% endif %}>Bucaramanga</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Destino</label>
+                <select name="destino" class="w-full border border-slate-300 rounded-xl p-3 focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-700">
+                    <option value="Medellín" {% if destino == 'Medellín' %}selected{% endif %}>Medellín</option>
+                    <option value="Bogotá" {% if destino == 'Bogotá' %}selected{% endif %}>Bogotá</option>
+                    <option value="Cali" {% if destino == 'Cali' %}selected{% endif %}>Cali</option>
+                    <option value="Barranquilla" {% if destino == 'Barranquilla' %}selected{% endif %}>Barranquilla</option>
+                    <option value="Bucaramanga" {% if destino == 'Bucaramanga' %}selected{% endif %}>Bucaramanga</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Fecha de Viaje</label>
+                <input 
+                    type="date" 
+                    name="fecha" 
+                    value="{{ fecha_raw }}" 
+                    class="w-full border border-slate-300 rounded-xl p-3 focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-700"
+                >
+            </div>
+            <div class="flex items-end">
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold p-3 rounded-xl transition flex items-center justify-center gap-2">
+                    <i data-lucide="search" class="w-5 h-5"></i> Buscar Rutas
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Resultados de Búsqueda -->
+    {% if viajes %}
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-bold text-slate-800">Rutas Disponibles ({% if origen %}{{ origen }} ➔ {{ destino }}{% else %}Todas las rutas{% endif %})</h2>
+            {% if fecha_formateada %}
+                <span class="bg-slate-100 text-slate-700 font-medium px-3 py-1 rounded-lg text-sm border border-slate-200">
+                    Fecha: {{ fecha_formateada }}
+                </span>
+            {% endif %}
+        </div>
+
+        <div class="space-y-4">
+            {% for viaje in viajes %}
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 flex flex-col md:flex-row justify-between items-center gap-4 shadow-sm hover:shadow-md transition">
+                <div class="space-y-1">
+                    <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">
+                        Bus: {{ viaje.id_bus }}
+                    </span>
+                    <div class="text-2xl font-black text-slate-900">
+                        {{ viaje.fecha_salida.strftime('%H:%M') }} 
+                        <span class="text-sm font-normal text-slate-500">({{ viaje.origen }} ➔ {{ viaje.destino }})</span>
+                    </div>
+                    <div class="text-xs text-slate-500">Fecha: {{ viaje.fecha_salida.strftime('%Y-%m-%d') }} | Estado: {{ viaje.estado }}</div>
+                </div>
+
+                <div class="text-right">
+                    <div class="text-2xl font-bold text-slate-900">$85,000 COP</div>
+                    <div class="text-xs text-slate-500 mb-2">Por pasajero</div>
+                    
+                    <button 
+                        type="button" 
+                        onclick="abrirModalCompra('{{ viaje.id_viaje }}', '85000')" 
+                        class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-5 py-2.5 rounded-xl text-sm transition flex items-center gap-2"
+                    >
+                        <i data-lucide="ticket" class="w-4 h-4"></i> Comprar Tiquete
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% elif request.method == 'POST' %}
+        <div class="text-center py-10 bg-white rounded-2xl border border-slate-200">
+            <p class="text-slate-500">No se encontraron rutas para la búsqueda ingresada.</p>
+        </div>
+    {% endif %}
+</div>
+
+<!-- MODAL DE COMPRA / INGRESO DE DATOS DEL PASAJERO -->
+<div id="modalCompra" class="fixed inset-0 bg-slate-900/50 hidden items-center justify-center z-50 p-4">
+    <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl border border-slate-100 p-6 space-y-6 relative">
+        <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+            <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                <i data-lucide="user-check" class="text-emerald-600"></i> Datos del Pasajero
+            </h3>
+            <button onclick="cerrarModalCompra()" class="text-slate-400 hover:text-slate-600">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+
+        <form id="formCompraModal" action="" method="POST" class="space-y-4">
+            <!-- Canal de venta -->
+            <div>
+                <label for="canal_venta" class="block text-xs font-medium text-slate-600 mb-1">Canal de Venta (Fábrica):</label>
+                <select name="canal_venta" id="canal_venta" class="w-full border border-slate-300 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none text-slate-700">
+                    <option value="web" selected>Página Web (Factura CUFE-WEB)</option>
+                    <option value="taquilla">Taquilla Física (POS-TAQUILLA)</option>
+                    <option value="aliada">Agencia Aliada (VOUCHER-ALIADO)</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Nombre Completo</label>
+                <input type="text" name="nombre_completo" required placeholder="Ej. Juan Pérez" class="w-full border border-slate-300 rounded-xl p-3 text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Documento de Identidad</label>
+                <input type="text" name="documento" required placeholder="Ej. 1018234567" class="w-full border border-slate-300 rounded-xl p-3 text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Número de Silla / Asiento (1-30)</label>
+                <input type="number" name="numero_silla" min="1" max="30" value="1" required class="w-full border border-slate-300 rounded-xl p-3 text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+            </div>
+
+            <input type="hidden" name="precio" id="inputPrecio" value="85000">
+
+            <div class="pt-2 flex gap-3">
+                <button type="button" onclick="cerrarModalCompra()" class="w-1/2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-3 rounded-xl transition text-sm">
+                    Cancelar
+                </button>
+                <button type="submit" class="w-1/2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition text-sm">
+                    Confirmar Compra
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function abrirModalCompra(viajeId, precio) {
+    const modal = document.getElementById('modalCompra');
+    const form = document.getElementById('formCompraModal');
+    const inputPrecio = document.getElementById('inputPrecio');
+    
+    form.action = `/comprar/${viajeId}`;
+    if (precio) inputPrecio.value = precio;
+    
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+}
+
+function cerrarModalCompra() {
+    const modal = document.getElementById('modalCompra');
+    modal.classList.remove('flex');
+    modal.classList.add('hidden');
+}
+</script>
+{% endblock %}

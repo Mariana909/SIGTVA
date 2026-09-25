@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}Inicio - Transporte Nacional{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 text-white py-20 px-4 relative overflow-hidden rounded-2xl mb-12">
+    <div class="max-w-5xl mx-auto text-center space-y-6 relative z-10">
+        <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight">
+            Conectamos tu mundo, <span class="text-blue-400">sin límites</span>
+        </h1>
+        <p class="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto">
+            Viaja cómodo y seguro por todo el país o envía tus paquetes con nuestra red logística de alta velocidad.
+        </p>
+        <div class="flex justify-center gap-4 pt-4">
+            <a href="{{ url_for('pasajeros') }}" class="bg-blue-600 hover:bg-blue-500 px-6 py-3 rounded-xl font-semibold shadow-lg transition">
+                Comprar Tiquetes
+            </a>
+            <a href="{{ url_for('gestionar_envios') }}" class="bg-slate-800 hover:bg-slate-700 px-6 py-3 rounded-xl font-semibold border border-slate-700 transition">
+                Registrar Envío
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Widget de Rastreo Rápido -->
+<section id="rastreo" class="max-w-3xl mx-auto -mt-16 px-4 relative z-20 mb-12">
+    <div class="bg-white rounded-2xl shadow-xl border border-slate-100 p-6">
+        <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+            <i data-lucide="search" class="text-blue-600"></i> Rastrear un Envío
+        </h2>
+        <form action="{{ url_for('rastrear_envio') }}" method="GET" class="flex gap-3">
+            <input 
+                type="text" 
+                name="numero_guia" 
+                placeholder="Ej. GUIA-A1B2C3" 
+                required
+                class="flex-1 border border-slate-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-800"
+            >
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-xl transition">
+                Buscar
+            </button>
+        </form>
+    </div>
+</section>
+
+<!-- Tarjetas de Servicios -->
+<section class="max-w-7xl mx-auto px-4 py-8 grid md:grid-cols-3 gap-8">
+    <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition">
+        <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600 mb-4">
+            <i data-lucide="users"></i>
+        </div>
+        <h3 class="font-bold text-xl mb-2">Transporte de Pasajeros</h3>
+        <p class="text-slate-600 text-sm">Flotas modernas con conectividad Wi-Fi, conectores de carga y máxima comodidad.</p>
+    </div>
+    <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition">
+        <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600 mb-4">
+            <i data-lucide="package"></i>
+        </div>
+        <h3 class="font-bold text-xl mb-2">Mensajería Express</h3>
+        <p class="text-slate-600 text-sm">Envíos prioritarios puerta a puerta con seguimiento Satelital GPS en tiempo real.</p>
+    </div>
+    <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition">
+        <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600 mb-4">
+            <i data-lucide="truck"></i>
+        </div>
+        <h3 class="font-bold text-xl mb-2">Carga Especializada</h3>
+        <p class="text-slate-600 text-sm">Soluciones logísticas integrales para pequeñas, medianas y grandes empresas.</p>
+    </div>
+</section>
+{% endblock %}
