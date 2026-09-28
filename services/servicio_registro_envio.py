@@ -8,7 +8,7 @@ Paqueteo, Corporativa o Remesa: cambiar de familia es cambiar la fábrica.
 """
 import logging
 
-from domain.envio import Envio, Ruta, Cliente, calcularPesoFacturable
+from domain.envio import Cliente, Envio, Ruta, calcularPesoFacturable
 from factories.fabrica_envio import FabricaEnvio
 
 logger = logging.getLogger("sigtva.envio")

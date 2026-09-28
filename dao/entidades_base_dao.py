@@ -1,5 +1,6 @@
 from models.database import db
-from models.entidades_base import ClienteModel, EmpleadoModel, BusModel
+from models.entidades_base import BusModel, ClienteModel, EmpleadoModel
+
 
 class ClienteDAO:
     @staticmethod

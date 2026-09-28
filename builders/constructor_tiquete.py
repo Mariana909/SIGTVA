@@ -15,7 +15,7 @@ import logging
 import uuid
 from abc import ABC, abstractmethod
 
-from domain.tiquete import Tiquete, Viaje, Silla, Pasajero, Pago, Factura
+from domain.tiquete import Factura, Pago, Pasajero, Silla, Tiquete, Viaje
 from factories.fabrica_tarifa import Tarifa
 
 logger = logging.getLogger("sigtva.tiquete")

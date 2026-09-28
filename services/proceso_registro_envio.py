@@ -6,7 +6,7 @@ Orquesta el patrón Abstract Factory (ServicioRegistroEnvio) y la capa de datos
 """
 from dao.entidades_base_dao import ClienteDAO
 from dao.transacciones_dao import EnvioDAO, FacturaDAO
-from factories.fabrica_envio import FabricaPaqueteo, FabricaCorporativa, FabricaRemesa
+from factories.fabrica_envio import FabricaCorporativa, FabricaPaqueteo, FabricaRemesa
 from services.servicio_registro_envio import ServicioRegistroEnvio
 from services.traza import CapturaTraza
 

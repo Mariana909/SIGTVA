@@ -1,6 +1,7 @@
 from models.database import db
 from models.operaciones import ViajeModel
 
+
 class ViajeDAO:
     @staticmethod
     def registrarViaje(origen, destino, fecha_salida, id_bus):

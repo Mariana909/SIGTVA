@@ -11,10 +11,13 @@ import logging
 from builders.constructor_tiquete import ConstructorTiqueteImpl, Taquillero
 from dao.entidades_base_dao import ClienteDAO
 from dao.operaciones_dao import ViajeDAO
-from dao.transacciones_dao import TiqueteDAO, FacturaDAO
-from domain.tiquete import Viaje, Silla, Pasajero
+from dao.transacciones_dao import FacturaDAO, TiqueteDAO
+from domain.tiquete import Pasajero, Silla, Viaje
 from factories.fabrica_tarifa import (
-    FabricaTarifaOrdinaria, FabricaTarifaEstudiante, FabricaTarifaAdultoMayor)
+    FabricaTarifaAdultoMayor,
+    FabricaTarifaEstudiante,
+    FabricaTarifaOrdinaria,
+)
 from services.traza import CapturaTraza
 
 logger = logging.getLogger("sigtva.tiquete")

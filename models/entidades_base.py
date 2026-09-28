@@ -1,5 +1,6 @@
 from models.database import db
 
+
 class ClienteModel(db.Model):
     __tablename__ = 'cliente'
 

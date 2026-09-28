@@ -7,10 +7,13 @@ Qué demuestra: el código cliente pide una tarifa a un CREADOR abstracto
 (FabricaTarifa) sin saber qué clase concreta se instancia; cada subclase del
 creador decide qué Tarifa fabricar en su factory method crearTarifa().
 """
-from _comun import titulo, seccion
-
+from _comun import seccion, titulo
 from factories.fabrica_tarifa import (
-    FabricaTarifa, FabricaTarifaOrdinaria, FabricaTarifaEstudiante, FabricaTarifaAdultoMayor)
+    FabricaTarifa,
+    FabricaTarifaAdultoMayor,
+    FabricaTarifaEstudiante,
+    FabricaTarifaOrdinaria,
+)
 
 VALOR_BASE = 85000.0
 

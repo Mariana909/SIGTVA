@@ -4,11 +4,10 @@ Es idempotente: si ya hay viajes, no hace nada.
 """
 import datetime
 
-from werkzeug.security import generate_password_hash
-
-from dao.entidades_base_dao import EmpleadoDAO, BusDAO
+from dao.entidades_base_dao import BusDAO, EmpleadoDAO
 from dao.operaciones_dao import ViajeDAO
 from models.operaciones import ViajeModel
+from werkzeug.security import generate_password_hash
 
 RUTAS = [
     ("Bogotá", "Medellín"), ("Bogotá", "Cali"), ("Bogotá", "Barranquilla"),

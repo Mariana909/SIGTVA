@@ -1,7 +1,9 @@
-import uuid
 import datetime
+import uuid
+
 from models.database import db
-from models.transacciones import TiqueteModel, EnvioModel, FacturaModel
+from models.transacciones import EnvioModel, FacturaModel, TiqueteModel
+
 
 class TiqueteDAO:
     @staticmethod
@@ -34,7 +36,7 @@ class TiqueteDAO:
             return True, "Tiquete registrado exitosamente.", tiquete
         except Exception as e:
             db.session.rollback()
-            return False, f"Error al registrar tiquete: {str(e)}", None
+            return False, f"Error al registrar tiquete: {e!s}", None
 
     @staticmethod
     def consultarTiquete(id_tiquete):
@@ -76,7 +78,7 @@ class EnvioDAO:
             return True, "Envío registrado exitosamente.", nuevo_envio
         except Exception as e:
             db.session.rollback()
-            return False, f"Error al registrar envío: {str(e)}", None
+            return False, f"Error al registrar envío: {e!s}", None
 
     @staticmethod
     def consultarEnvio(numero_guia):
@@ -103,7 +105,7 @@ class FacturaDAO:
             return True, "Factura emitida correctamente.", factura
         except Exception as e:
             db.session.rollback()
-            return False, f"Error en facturación: {str(e)}", None
+            return False, f"Error en facturación: {e!s}", None
 
     @staticmethod
     def consultarFactura(id_factura):

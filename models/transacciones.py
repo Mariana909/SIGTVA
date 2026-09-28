@@ -1,5 +1,7 @@
-from models.database import db
 import datetime
+
+from models.database import db
+
 
 class TiqueteModel(db.Model):
     __tablename__ = 'tiquete'

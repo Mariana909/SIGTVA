@@ -1,5 +1,6 @@
 from models.database import db
 
+
 class ViajeModel(db.Model):
     __tablename__ = 'viaje'
 

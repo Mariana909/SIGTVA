@@ -7,9 +7,8 @@ Qué demuestra: ServicioRegistroEnvio (cliente) recibe UNA fábrica y arma el
 envío usando solo interfaces. Al cambiar la fábrica cambia toda la familia de
 productos (flete, peso, guía, aviso, crédito) sin tocar el código del cliente.
 """
-from _comun import titulo, seccion
-
-from factories.fabrica_envio import FabricaPaqueteo, FabricaCorporativa, FabricaRemesa
+from _comun import seccion, titulo
+from factories.fabrica_envio import FabricaCorporativa, FabricaPaqueteo, FabricaRemesa
 from services.servicio_registro_envio import ServicioRegistroEnvio
 
 FAMILIAS = (("Paqueteo", FabricaPaqueteo), ("Corporativa", FabricaCorporativa), ("Remesa", FabricaRemesa))
