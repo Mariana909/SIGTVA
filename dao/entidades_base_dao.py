@@ -87,3 +87,7 @@ class BusDAO:
     @staticmethod
     def consultarBus(id_bus):
         return BusModel.query.get(id_bus)
+
+    @staticmethod
+    def listarBuses():
+        return BusModel.query.order_by(BusModel.id_bus).all()

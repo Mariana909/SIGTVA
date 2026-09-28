@@ -11,11 +11,14 @@ Roles del patrón
 """
 import datetime
 import hashlib
+import logging
 import uuid
 from abc import ABC, abstractmethod
 
 from domain.tiquete import Tiquete, Viaje, Silla, Pasajero, Pago, Factura
 from factories.fabrica_tarifa import Tarifa
+
+logger = logging.getLogger("sigtva.tiquete")
 
 
 # ═══════════════════════ CONSTRUCTOR (INTERFAZ) ═══════════════════════
@@ -57,21 +60,25 @@ class ConstructorTiqueteImpl(ConstructorTiquete):
 
     def fijarViaje(self, v: Viaje) -> None:
         self._tiquete.viaje = v
+        logger.info("[Builder] 1. fijarViaje: %s -> %s", v.origen, v.destino)
 
     def bloquearSilla(self, s: Silla) -> None:
         if s.numero <= 0:
             raise ValueError("Número de silla inválido.")
         s.estado = "Bloqueada"
         self._tiquete.silla = s
+        logger.info("[Builder] 2. bloquearSilla: silla %s bloqueada", s.numero)
 
     def fijarPasajero(self, p: Pasajero) -> None:
         if not p.documento or not p.nombre:
             raise ValueError("El pasajero requiere documento y nombre.")
         self._tiquete.pasajero = p
+        logger.info("[Builder] 3. fijarPasajero: %s (doc. %s)", p.nombre, p.documento)
 
     def fijarTarifa(self, t: Tarifa) -> None:
         self._tiquete.tarifa = t
         self._tiquete.valorFinal = t.calcular()
+        logger.info("[Builder] 4. fijarTarifa: %s = $%s", t.descripcion(), f"{self._tiquete.valorFinal:,.0f}")
 
     def fijarPago(self, pago: Pago) -> None:
         if self._tiquete.tarifa is None:
@@ -79,6 +86,7 @@ class ConstructorTiqueteImpl(ConstructorTiquete):
         if abs(pago.valor - self._tiquete.valorFinal) > 0.01:
             raise ValueError("El valor del pago no coincide con el valor final del tiquete.")
         self._tiquete.pago = pago
+        logger.info("[Builder] 5. fijarPago: %s por $%s", pago.metodo, f"{pago.valor:,.0f}")
 
     def emitirFactura(self) -> None:
         if self._tiquete.pago is None:
@@ -87,6 +95,7 @@ class ConstructorTiqueteImpl(ConstructorTiquete):
         huella = f"{t.numero}|{t.fechaVenta}|{t.pago.valor}"
         cufe = hashlib.sha384(huella.encode()).hexdigest()  # simula el CUFE de la factura electrónica
         t.factura = Factura(cufe=cufe, total=t.pago.valor)
+        logger.info("[Builder] 6. emitirFactura: CUFE %s...", cufe[:16])
 
     def construir(self) -> Tiquete:
         t = self._tiquete
@@ -98,6 +107,7 @@ class ConstructorTiqueteImpl(ConstructorTiquete):
             raise ValueError(f"Tiquete incompleto, faltan: {', '.join(faltantes)}.")
         t.estado = "Emitido"
         t.silla.estado = "Ocupada"
+        logger.info("[Builder] 7. construir: tiquete %s completo y entregado", t.numero)
         self.reset()  # el constructor queda listo para el siguiente tiquete
         return t
 
@@ -112,6 +122,7 @@ class Taquillero:
     def venderTiquete(self, viaje: Viaje, silla: Silla, pasajero: Pasajero,
                       tarifa: Tarifa, metodoPago: str) -> Tiquete:
         c = self._constructor
+        logger.info("[Builder] El Director (Taquillero) inicia la venta")
         c.fijarViaje(viaje)
         c.bloquearSilla(silla)
         c.fijarPasajero(pasajero)

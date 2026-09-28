@@ -5,23 +5,13 @@
 {% block content %}
 <style>
     @media print {
-        header, footer, .no-print {
-            display: none !important;
-        }
-        body {
-            background-color: white !important;
-        }
-        .print-card {
-            box-shadow: none !important;
-            border: 1px solid #e2e8f0 !important;
-            margin: 0 !important;
-            max-width: 100% !important;
-        }
+        header, footer, .no-print { display: none !important; }
+        body { background-color: white !important; }
+        .print-card { box-shadow: none !important; border: 1px solid #e2e8f0 !important; margin: 0 !important; max-width: 100% !important; }
     }
 </style>
 
 <div class="max-w-3xl mx-auto px-4 py-8">
-    <!-- Botones de Acción (Visibles solo en pantalla) -->
     <div class="no-print flex justify-between items-center mb-6">
         <a href="{{ url_for('index') }}" class="text-slate-600 hover:text-slate-900 font-medium flex items-center gap-2 transition">
             <i data-lucide="arrow-left" class="w-5 h-5"></i> Volver al Inicio
@@ -31,138 +21,138 @@
         </button>
     </div>
 
-    <!-- Contenedor Principal de la Factura -->
     <div class="print-card bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden p-8">
-        
-        <!-- Encabezado de Factura -->
+
+        <!-- Encabezado -->
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-100 pb-6 mb-6 gap-4">
             <div>
                 <span class="text-xs font-bold uppercase tracking-wider text-blue-600 bg-blue-50 px-3 py-1 rounded-full">
-                    Comprobante Oficial de Pago
+                    {% if tipo == 'tiquete' %}Factura electrónica · Tiquete{% else %}Comprobante de Encomienda{% endif %}
                 </span>
                 <h1 class="text-2xl font-extrabold text-slate-900 mt-2">Transportes Vía Andina</h1>
-                <p class="text-xs text-slate-500">NIT: 800.123.456-7 | Regimen Común</p>
+                <p class="text-xs text-slate-500">NIT: 800.123.456-7 | Régimen Común</p>
             </div>
             <div class="sm:text-right">
                 <p class="text-sm font-semibold text-slate-500">Factura de Venta</p>
                 <p class="text-2xl font-black text-slate-800">#FAC-{{ "%05d"|format(factura.id_factura) }}</p>
-                <p class="text-xs text-slate-500 mt-1">
-                    <i data-lucide="calendar" class="w-3.5 h-3.5 inline mr-1"></i>
-                    {{ factura.fecha_emision.strftime('%d/%m/%Y %H:%M') if factura.fecha_emision else 'Fecha Actual' }}
-                </p>
+                <p class="text-xs text-slate-500 mt-1">{{ factura.fecha_emision.strftime('%d/%m/%Y %H:%M') if factura.fecha_emision else '' }}</p>
             </div>
         </div>
 
-        <!-- Detalles de la Transacción (Tiquete o Envío) -->
-        {% if factura.tiquete %}
-            <!-- CASO: TIQUETE DE PASAJERO -->
-            <div class="mb-8">
-                <div class="bg-slate-50 rounded-xl p-4 border border-slate-100 mb-6 flex items-center gap-3">
-                    <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center font-bold">
-                        <i data-lucide="ticket"></i>
-                    </div>
-                    <div>
-                        <h2 class="font-bold text-slate-800">Tiquete de Transporte de Pasajeros</h2>
-                        <p class="text-xs text-slate-500">Canal de Venta: <span class="font-semibold text-slate-700">{{ factura.tiquete.canal_venta }}</span></p>
-                    </div>
-                </div>
-
-                <div class="grid md:grid-cols-2 gap-6 text-sm">
-                    <div class="space-y-2">
-                        <p class="text-xs text-slate-400 font-bold uppercase">Información del Pasajero</p>
-                        <p class="font-semibold text-slate-800">{{ factura.tiquete.cliente.nombre_completo }}</p>
-                        <p class="text-slate-600">Doc: {{ factura.tiquete.cliente.id_cliente }}</p>
-                    </div>
-                    <div class="space-y-2">
-                        <p class="text-xs text-slate-400 font-bold uppercase">Detalles del Viaje</p>
-                        <p class="font-semibold text-slate-800">
-                            {{ factura.tiquete.viaje.origen }} <i data-lucide="arrow-right" class="w-4 h-4 inline mx-1 text-slate-400"></i> {{ factura.tiquete.viaje.destino }}
-                        </p>
-                        <p class="text-slate-600">Silla Asignada: <span class="font-bold text-blue-600">N° {{ factura.tiquete.numero_silla }}</span></p>
-                        <p class="text-slate-600">N° Tiquete: {{ factura.tiquete.numero_tiquete }}</p>
-                    </div>
-                </div>
+        {% if tipo == 'tiquete' %}
+        <!-- ══════ TIQUETE ══════ -->
+        <div class="grid md:grid-cols-2 gap-6 text-sm mb-6">
+            <div class="space-y-1">
+                <p class="text-xs text-slate-400 font-bold uppercase">Pasajero</p>
+                <p class="font-semibold text-slate-800">{{ tiquete.pasajero.nombre }}</p>
+                <p class="text-slate-600">Doc: {{ tiquete.pasajero.documento }}</p>
             </div>
-
-        {% elif factura.envio %}
-            <!-- CASO: ENVÍO DE ENCOMIENDA -->
-            <div class="mb-8">
-                <div class="bg-slate-50 rounded-xl p-4 border border-slate-100 mb-6 flex items-center gap-3">
-                    <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center font-bold">
-                        <i data-lucide="package"></i>
-                    </div>
-                    <div>
-                        <h2 class="font-bold text-slate-800">Servicio de Encomiendas y Cargo</h2>
-                        <p class="text-xs text-slate-500">Modalidad: <span class="font-semibold text-slate-700">{{ factura.envio.modalidad }}</span></p>
-                    </div>
-                </div>
-
-                <div class="grid md:grid-cols-2 gap-6 text-sm mb-4">
-                    <div class="space-y-1">
-                        <p class="text-xs text-slate-400 font-bold uppercase">Remitente</p>
-                        <p class="font-semibold text-slate-800">{{ factura.envio.remitente.nombre_completo }}</p>
-                        <p class="text-slate-600">Doc: {{ factura.envio.remitente.id_cliente }}</p>
-                    </div>
-                    <div class="space-y-1">
-                        <p class="text-xs text-slate-400 font-bold uppercase">Destinatario</p>
-                        <p class="font-semibold text-slate-800">{{ factura.envio.destinatario.nombre_completo }}</p>
-                        <p class="text-slate-600">Doc: {{ factura.envio.destinatario.id_cliente }}</p>
-                    </div>
-                </div>
-
-                <div class="border-t border-slate-100 pt-4 grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                        <p class="text-xs text-slate-400 font-bold uppercase">Número de Guía</p>
-                        <p class="font-mono font-bold text-blue-600 text-base">{{ factura.envio.numero_guia }}</p>
-                    </div>
-                    <div>
-                        <p class="text-xs text-slate-400 font-bold uppercase">Peso Registrado</p>
-                        <p class="font-semibold text-slate-800">{{ factura.envio.peso_kg }} kg</p>
-                    </div>
-                </div>
+            <div class="space-y-1">
+                <p class="text-xs text-slate-400 font-bold uppercase">Viaje</p>
+                <p class="font-semibold text-slate-800">{{ tiquete.viaje.origen }} ➔ {{ tiquete.viaje.destino }}</p>
+                <p class="text-slate-600">Silla: <span class="font-bold text-blue-600">N° {{ tiquete.silla.numero }}</span> ({{ tiquete.silla.estado }})</p>
             </div>
-        {% endif %}
+            <div class="space-y-1">
+                <p class="text-xs text-slate-400 font-bold uppercase">Tiquete</p>
+                <p class="font-mono font-bold text-slate-800">{{ tiquete.numero }}</p>
+                <p class="text-slate-600">{{ tiquete.fechaVenta }} · {{ tiquete.estado }}</p>
+            </div>
+            <div class="space-y-1">
+                <p class="text-xs text-slate-400 font-bold uppercase">Tarifa aplicada</p>
+                <p class="font-semibold text-slate-800">{{ tiquete.tarifa.descripcion() }}</p>
+                <p class="text-slate-600">Pago: {{ tiquete.pago.metodo }}</p>
+            </div>
+        </div>
 
-        <!-- Tabla Resumen de Cobro -->
         <div class="border-t border-b border-slate-100 py-4 mb-6">
             <table class="w-full text-left text-sm">
-                <thead>
-                    <tr class="text-xs font-bold text-slate-400 uppercase">
-                        <th class="py-2">Descripción</th>
-                        <th class="py-2 text-right">Cant.</th>
-                        <th class="py-2 text-right">Total</th>
-                    </tr>
-                </thead>
+                <thead><tr class="text-xs font-bold text-slate-400 uppercase"><th class="py-2">Descripción</th><th class="py-2 text-right">Total</th></tr></thead>
                 <tbody class="divide-y divide-slate-50">
-                    <tr>
-                        <td class="py-3 font-medium text-slate-800">
-                            {% if factura.tiquete %}
-                                Servicio de Transporte Pasajeros ({{ factura.tiquete.canal_venta }})
-                            {% elif factura.envio %}
-                                Servicio Logístico / Envío {{ factura.envio.modalidad }}
-                            {% else %}
-                                Servicio de Transporte
-                            {% endif %}
-                        </td>
-                        <td class="py-3 text-right text-slate-600">1</td>
-                        <td class="py-3 text-right font-semibold text-slate-800">${{ "{:,.2f}".format(factura.monto_total) }}</td>
-                    </tr>
+                    <tr><td class="py-3 text-slate-800">Transporte de pasajeros (valor base)</td>
+                        <td class="py-3 text-right text-slate-800">${{ "{:,.0f}".format(tiquete.tarifa.valorBase) }}</td></tr>
+                    {% if tiquete.tarifa.DESCUENTO > 0 %}
+                    <tr><td class="py-3 text-emerald-700">Descuento {{ (tiquete.tarifa.DESCUENTO * 100)|round|int }}%</td>
+                        <td class="py-3 text-right text-emerald-700">-${{ "{:,.0f}".format(tiquete.tarifa.valorBase - tiquete.valorFinal) }}</td></tr>
+                    {% endif %}
                 </tbody>
             </table>
         </div>
+        <p class="text-xs text-slate-400 uppercase font-bold">CUFE</p>
+        <p class="font-mono text-[11px] text-slate-600 break-all mb-6">{{ factura.cufe }}</p>
 
-        <!-- Total Liquidado -->
+        {% else %}
+        <!-- ══════ ENVÍO ══════ -->
+        <div class="grid md:grid-cols-2 gap-6 text-sm mb-6">
+            <div class="space-y-1">
+                <p class="text-xs text-slate-400 font-bold uppercase">Remitente</p>
+                <p class="font-semibold text-slate-800">{{ remitente.nombre_completo }}</p>
+                <p class="text-slate-600">Doc: {{ remitente.id_cliente }}</p>
+            </div>
+            <div class="space-y-1">
+                <p class="text-xs text-slate-400 font-bold uppercase">Destinatario</p>
+                <p class="font-semibold text-slate-800">{{ destinatario.nombre_completo }}</p>
+                <p class="text-slate-600">Doc: {{ destinatario.id_cliente }}</p>
+            </div>
+            <div class="space-y-1">
+                <p class="text-xs text-slate-400 font-bold uppercase">Guía</p>
+                <p class="font-mono font-bold text-blue-600 text-base">{{ envio.guia.numero }}</p>
+                <p class="font-mono text-xs text-slate-500">{{ envio.guia.codigoBarras }}</p>
+            </div>
+            <div class="space-y-1">
+                <p class="text-xs text-slate-400 font-bold uppercase">Ruta y modalidad</p>
+                <p class="font-semibold text-slate-800">{{ envio.ruta.origen }} ➔ {{ envio.ruta.destino }}</p>
+                <p class="text-slate-600">{{ envio.tipoServicio }} · {{ envio.estado }}</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-4 text-sm bg-slate-50 rounded-xl p-4 border border-slate-100 mb-6">
+            <div><p class="text-xs text-slate-400 font-bold uppercase">Peso real</p><p class="font-semibold">{{ peso_real }} kg</p></div>
+            <div><p class="text-xs text-slate-400 font-bold uppercase">Dimensiones (cm)</p><p class="font-semibold">{{ dims }}</p></div>
+            <div><p class="text-xs text-slate-400 font-bold uppercase">Peso facturable</p><p class="font-semibold text-blue-600">{{ envio.pesoFacturable }} kg</p></div>
+        </div>
+
+        <div class="border-t border-b border-slate-100 py-4 mb-6">
+            <table class="w-full text-left text-sm">
+                <thead><tr class="text-xs font-bold text-slate-400 uppercase"><th class="py-2">Descripción</th><th class="py-2 text-right">Total</th></tr></thead>
+                <tbody>
+                    <tr><td class="py-3 text-slate-800">Flete {{ envio.tipoServicio }} ({{ envio.pesoFacturable }} kg facturables)</td>
+                        <td class="py-3 text-right text-slate-800">${{ "{:,.0f}".format(envio.valorFlete) }}</td></tr>
+                    {% if envio.valorDeclarado > 0 %}
+                    <tr><td class="py-2 text-xs text-slate-500">Valor declarado de la mercancía (informativo)</td>
+                        <td class="py-2 text-right text-xs text-slate-500">${{ "{:,.0f}".format(envio.valorDeclarado) }}</td></tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+
         <div class="flex justify-between items-center bg-slate-900 text-white p-4 rounded-xl mb-6">
             <span class="text-sm font-medium text-slate-300">Total Pagado (COP)</span>
-            <span class="text-2xl font-black text-blue-400">${{ "{:,.2f}".format(factura.monto_total) }}</span>
+            <span class="text-2xl font-black text-blue-400">${{ "{:,.0f}".format(factura.monto_total) }}</span>
         </div>
 
-        <!-- Pie de Factura -->
         <div class="text-center text-xs text-slate-400 space-y-1">
             <p>Atendido por Cajero ID: #{{ factura.id_cajero }}</p>
-            <p>¡Gracias por viajar y confiar en Transportes Vía Andina!</p>
+            <p>¡Gracias por confiar en Transportes Vía Andina!</p>
         </div>
+    </div>
 
+    <!-- ══════ PANEL DE PATRONES (no se imprime) ══════ -->
+    <div class="no-print mt-8 bg-slate-900 rounded-2xl p-6 shadow-xl">
+        <div class="flex flex-wrap items-center gap-2 mb-4">
+            <span class="text-white font-bold mr-2 flex items-center gap-2"><i data-lucide="workflow" class="w-5 h-5 text-blue-400"></i> Patrones en acción</span>
+            {% for p in patrones %}
+            <span class="text-xs font-bold bg-blue-500/20 text-blue-300 border border-blue-500/40 px-3 py-1 rounded-full">{{ p }}</span>
+            {% endfor %}
+        </div>
+        <ol class="space-y-1.5 font-mono text-xs leading-relaxed">
+            {% for linea in traza %}
+            <li class="flex gap-3">
+                <span class="text-slate-500 select-none w-5 text-right">{{ loop.index }}</span>
+                <span class="{% if 'Builder' in linea %}text-emerald-300{% elif 'Factory Method' in linea %}text-amber-300{% elif 'Abstract Factory' in linea %}text-sky-300{% else %}text-slate-300{% endif %}">{{ linea }}</span>
+            </li>
+            {% endfor %}
+        </ol>
     </div>
 </div>
 {% endblock %}

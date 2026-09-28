@@ -26,7 +26,7 @@
                 <!-- Menú Principal -->
                 <nav class="hidden md:flex space-x-8">
                     <a href="{{ url_for('index') }}" class="text-slate-600 hover:text-blue-600 font-medium transition-colors">Inicio</a>
-                    <a href="{{ url_for('index') }}" class="text-slate-600 hover:text-blue-600 font-medium transition-colors">Pasajeros</a>
+                    <a href="{{ url_for('pasajeros') }}" class="text-slate-600 hover:text-blue-600 font-medium transition-colors">Pasajeros</a>
                     <a href="{{ url_for('gestionar_envios') }}" class="text-slate-600 hover:text-blue-600 font-medium transition-colors">Envíos</a>
                     <a href="{{ url_for('rastrear_envio') }}" class="text-slate-600 hover:text-blue-600 font-medium transition-colors">Rastreo</a>
                     <a href="{{ url_for('crear_viaje') }}" class="text-amber-600 hover:text-amber-700 font-medium transition-colors">+ Crear Viaje</a>
@@ -34,8 +34,8 @@
 
                 <!-- Acciones Rápidas -->
                 <div class="flex items-center gap-3">
-                    <a href="{{ url_for('rastrear_envio') }}" class="hidden sm:inline-flex text-slate-600 hover:text-blue-600 font-medium px-3 py-2">Rastrear</a>
-                    <a href="{{ url_for('index') }}" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-lg shadow-sm transition-all">
+                    <span class="hidden sm:inline text-xs text-slate-400">Rol: {{ session.get('rol', 'invitado') }} (<a class="underline" href="{{ url_for('cambiar_rol', nuevo_rol='admin') }}">admin</a> · <a class="underline" href="{{ url_for('cambiar_rol', nuevo_rol='invitado') }}">invitado</a>)</span>
+                    <a href="{{ url_for('pasajeros') }}" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-lg shadow-sm transition-all">
                         Comprar Tiquetes
                     </a>
                 </div>

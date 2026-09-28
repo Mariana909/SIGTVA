@@ -1,0 +1,59 @@
+"""
+Capa de LÓGICA — caso de uso «Registrar envío».
+
+Orquesta el patrón Abstract Factory (ServicioRegistroEnvio) y la capa de datos
+(DAO). Las rutas de Flask solo llaman a este proceso.
+"""
+from dao.entidades_base_dao import ClienteDAO
+from dao.transacciones_dao import EnvioDAO, FacturaDAO
+from factories.fabrica_envio import FabricaPaqueteo, FabricaCorporativa, FabricaRemesa
+from services.servicio_registro_envio import ServicioRegistroEnvio
+from services.traza import CapturaTraza
+
+
+class ProcesoRegistroEnvio:
+    # Selección de la familia según la modalidad elegida en pantalla.
+    FABRICAS = {
+        "paqueteo": FabricaPaqueteo,
+        "corporativa": FabricaCorporativa,
+        "remesa": FabricaRemesa,
+    }
+
+    def registrar(self, modalidad: str, doc_remitente: str, nom_remitente: str,
+                  doc_destinatario: str, nom_destinatario: str, peso: float, dims: str,
+                  origen: str, destino: str, id_usuario: str, valor_declarado: float = 0.0) -> dict:
+        clase_fabrica = self.FABRICAS.get(modalidad)
+        if clase_fabrica is None:
+            raise ValueError("Modalidad de envío desconocida.")
+
+        with CapturaTraza("sigtva.envio") as traza:
+            # ── Patrón: el cliente arma el envío solo con interfaces ──
+            servicio = ServicioRegistroEnvio(clase_fabrica())
+            servicio.fijarModalidad(modalidad.capitalize())
+            envio = servicio.construir(peso, dims, origen, destino, doc_remitente, valor_declarado)
+
+            # ── Persistencia ──
+            remitente = ClienteDAO.registrarCliente(doc_remitente, "CC", nom_remitente, "", "")
+            destinatario = ClienteDAO.registrarCliente(doc_destinatario, "CC", nom_destinatario, "", "")
+            ok, msg, envio_db = EnvioDAO.registrarEnvio(
+                id_remitente=remitente.id_cliente,
+                id_destinatario=destinatario.id_cliente,
+                id_usuario_registra=id_usuario,
+                peso_kg=envio.pesoFacturable,
+                monto_flete=envio.valorFlete,
+                modalidad=envio.tipoServicio,
+                numero_guia_custom=envio.guia.numero,
+            )
+            if not ok:
+                raise ValueError(msg)
+            ok, msg, factura_db = FacturaDAO.registrarFactura(
+                monto_total=envio.valorFlete, id_cajero=id_usuario, id_envio=envio_db.id_envio)
+            if not ok:
+                raise ValueError(msg)
+
+        return {
+            "tipo": "envio", "envio": envio, "envio_db": envio_db, "factura": factura_db,
+            "remitente": remitente, "destinatario": destinatario,
+            "peso_real": peso, "dims": dims, "traza": traza.mensajes,
+            "patrones": ["Abstract Factory"],
+        }

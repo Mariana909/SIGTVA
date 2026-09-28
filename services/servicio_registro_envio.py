@@ -6,8 +6,18 @@ ServicioRegistroEnvio recibe la fábrica de la modalidad y arma el envío
 usando ÚNICAMENTE las interfaces de producto. No sabe si trabaja con
 Paqueteo, Corporativa o Remesa: cambiar de familia es cambiar la fábrica.
 """
+import logging
+
 from domain.envio import Envio, Ruta, Cliente, calcularPesoFacturable
 from factories.fabrica_envio import FabricaEnvio
+
+logger = logging.getLogger("sigtva.envio")
+
+
+def _creado(metodo: str, producto):
+    """Deja constancia de qué producto concreto entregó la fábrica."""
+    logger.info("[Abstract Factory] %s -> %s", metodo, type(producto).__name__)
+    return producto
 
 
 class ServicioRegistroEnvio:
@@ -21,23 +31,33 @@ class ServicioRegistroEnvio:
 
     def construir(self, peso: float, dims: str, origen: str, destino: str,
                   documentoRemitente: str, valorDeclarado: float = 0.0) -> Envio:
+        logger.info("[Abstract Factory] Familia seleccionada: %s", type(self._fabrica).__name__)
+
         # 1. Peso: la familia decide el tope (usa máx(real, volumétrico)).
-        if not self._fabrica.crearPeso().validar(peso, dims):
-            pesoFact = calcularPesoFacturable(peso, dims)
-            raise ValueError(
-                f"El peso facturable ({pesoFact} kg) supera el tope de la modalidad {self._modalidad}."
-            )
+        validador = _creado("crearPeso()", self._fabrica.crearPeso())
         pesoFacturable = calcularPesoFacturable(peso, dims)
+        if not validador.validar(peso, dims):
+            logger.info("[Abstract Factory] Peso facturable %s kg RECHAZADO por la familia", pesoFacturable)
+            raise ValueError(
+                f"El peso facturable ({pesoFacturable} kg) supera el tope de la modalidad {self._modalidad}."
+            )
+        logger.info("[Abstract Factory] Peso facturable %s kg aceptado (real %s kg)", pesoFacturable, peso)
 
         # 2. Flete: la familia decide la tarifa.
-        flete = self._fabrica.crearFlete().calcular(f"{origen}-{destino}", pesoFacturable)
+        calculador = _creado("crearFlete()", self._fabrica.crearFlete())
+        flete = calculador.calcular(f"{origen}-{destino}", pesoFacturable)
+        logger.info("[Abstract Factory] Flete calculado: $%s (prioridad %s)",
+                    f"{flete:,.0f}", calculador.obtenerPrioridad())
 
         # 3. Crédito: la familia decide si exige cupo.
-        if not self._fabrica.crearCredito().validarCupo(documentoRemitente, flete):
+        credito = _creado("crearCredito()", self._fabrica.crearCredito())
+        if not credito.validarCupo(documentoRemitente, flete):
+            logger.info("[Abstract Factory] Cupo de crédito insuficiente")
             raise ValueError(f"El flete (${flete:,.0f}) supera el cupo de crédito del cliente.")
 
         # 4. Guía: la familia decide el formato.
-        guia = self._fabrica.crearGuia().generar({"documento": documentoRemitente})
+        generador = _creado("crearGuia()", self._fabrica.crearGuia())
+        guia = generador.generar({"documento": documentoRemitente})
 
         # 5. Ensamble del producto y aviso.
         envio = Envio(
@@ -49,5 +69,5 @@ class ServicioRegistroEnvio:
             ruta=Ruta(origen, destino),
             cliente=Cliente(documentoRemitente),
         )
-        self._fabrica.crearAviso().avisar(envio)
+        _creado("crearAviso()", self._fabrica.crearAviso()).avisar(envio)
         return envio

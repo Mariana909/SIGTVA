@@ -5,7 +5,7 @@ from models.transacciones import TiqueteModel, EnvioModel, FacturaModel
 
 class TiqueteDAO:
     @staticmethod
-    def registrarTiquete(id_viaje, id_cliente, id_usuario_registra, numero_silla, precio_total, canal_venta="Web"):
+    def registrarTiquete(id_viaje, id_cliente, id_usuario_registra, numero_silla, precio_total, canal_venta="Web", numero_tiquete=None):
         # Prevención de duplicado / overbooking: verificar si la silla ya está vendida para ese viaje
         silla_ocupada = TiqueteModel.query.filter_by(
             id_viaje=id_viaje,
@@ -17,7 +17,8 @@ class TiqueteDAO:
             return False, f"La silla {numero_silla} ya está ocupada para este viaje.", None
 
         try:
-            num_tiquete = f"TQ-{uuid.uuid4().hex[:6].upper()}"
+            # Si el Builder ya numeró el tiquete, se conserva ese número.
+            num_tiquete = numero_tiquete or f"TQ-{uuid.uuid4().hex[:6].upper()}"
             tiquete = TiqueteModel(
                 numero_tiquete=num_tiquete,
                 id_viaje=id_viaje,
@@ -85,9 +86,10 @@ class EnvioDAO:
 
 class FacturaDAO:
     @staticmethod
-    def registrarFactura(monto_total, id_cajero, id_tiquete=None, id_envio=None):
+    def registrarFactura(monto_total, id_cajero, id_tiquete=None, id_envio=None, cufe=None):
         try:
-            cufe = uuid.uuid4().hex
+            # Si el Builder ya emitió el CUFE de la factura, se conserva.
+            cufe = cufe or uuid.uuid4().hex
             factura = FacturaModel(
                 cufe=cufe,
                 fecha_emision=datetime.datetime.now(),
