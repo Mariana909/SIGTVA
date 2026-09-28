@@ -45,7 +45,7 @@ class Guia(PrototipoGuia):
 
     def clonar(self) -> "Guia":
         clon = copy.copy(self)
-        logger.info("[Prototype] Guia.clonar: copia superficial de la guía %s", self.numero)
+        logger.info("[Prototype] Guia.clonar: copia superficial de %s", self.numero)
         return clon
 
 
@@ -63,8 +63,7 @@ class Tula(PrototipoGuia):
 
     def clonar(self) -> "Tula":
         clon = copy.deepcopy(self)
-        logger.info("[Prototype] Tula.clonar: copia profunda (lista propia) del precinto %s",
-                    self.precinto)
+        logger.info("[Prototype] Tula.clonar: copia profunda de %s", self.precinto)
         return clon
 
 
@@ -81,7 +80,7 @@ class Remesa(PrototipoGuia):
 
     def clonar(self) -> "Remesa":
         clon = copy.deepcopy(self)
-        logger.info("[Prototype] Remesa.clonar: copia profunda del lote %s", self.numero)
+        logger.info("[Prototype] Remesa.clonar: copia profunda de %s", self.numero)
         return clon
 
 

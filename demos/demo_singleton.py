@@ -10,8 +10,7 @@ consecutivo no se repite y la caché evita reconsultas.
 import threading
 import time
 
-from _comun import titulo, seccion
-
+from _comun import seccion, titulo
 from singletons.gestor_bloqueo import GestorBloqueoSillas
 from singletons.secuenciadores import SecuenciadorTiquete
 from singletons.validador_tarifa import ValidadorTarifaEspecial

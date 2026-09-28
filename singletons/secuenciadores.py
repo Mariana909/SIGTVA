@@ -37,7 +37,7 @@ class _SecuenciadorBase:
         return cls._instancia
 
     @classmethod
-    def obtenerInstancia(cls):
+    def obtenerInstancia(cls):  # noqa: N802 - nombre UML/diagrama
         return cls()
 
     def siguiente(self) -> str:

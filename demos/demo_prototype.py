@@ -7,8 +7,7 @@ Qué demuestra: el CONTROL (ServicioPrototipos) nunca construye guías a mano;
 pide copias al RegistroPrototipos. Guia se clona superficial (solo valores);
 Tula y Remesa se clonan profundo (cada clon trae su propia lista).
 """
-from _comun import titulo, seccion
-
+from _comun import seccion, titulo
 from prototypes.prototipos_envio import RegistroPrototipos
 from services.servicio_prototipos import ServicioPrototipos
 
@@ -20,7 +19,7 @@ seccion("1. Radicar remesa: 1 remitente, 3 destinos, 0 digitaciones repetidas")
 lote = servicio.radicar_remesa("CC-123", ["Bogotá", "Medellín", "Cali"])
 remesa = lote["remesa"]
 print(f"   Remesa {remesa.numero} de {remesa.cliente} con {len(remesa.guias)} guías:")
-for guia, tula in zip(remesa.guias, lote["tulas"]):
+for guia, tula in zip(remesa.guias, lote["tulas"], strict=True):
     print(f"   guía {guia.numero} -> {tula.destino} (precinto {tula.precinto})")
 
 seccion("2. La plantilla no se contamina: ajustar un clon no toca el original")

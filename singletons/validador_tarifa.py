@@ -18,7 +18,7 @@ logger = logging.getLogger("sigtva.singleton")
 
 
 class ValidadorTarifaEspecial:
-    """Caché compartida de validaciones. El primer uso consulta, los demás reutilizan."""
+    """Caché compartida: el primer uso consulta, los demás reutilizan."""
 
     _instancia = None
     _candado = threading.Lock()
@@ -33,7 +33,7 @@ class ValidadorTarifaEspecial:
         return cls._instancia
 
     @classmethod
-    def obtenerInstancia(cls) -> "ValidadorTarifaEspecial":
+    def obtenerInstancia(cls) -> "ValidadorTarifaEspecial":  # noqa: N802 - nombre UML/diagrama
         return cls()
 
     def validar(self, tipo_tarifa: str, soporte: str) -> bool:
@@ -51,7 +51,7 @@ class ValidadorTarifaEspecial:
 
     @staticmethod
     def _edad(soporte: str) -> int:
-        """Edad del soporte o -1 si viene malformado (nunca revienta: lo inválido niega)."""
+        """Edad del soporte o -1 si viene malformado (lo inválido niega)."""
         try:
             return int(soporte.split(":")[1])
         except (IndexError, ValueError):

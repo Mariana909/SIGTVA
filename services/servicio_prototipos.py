@@ -18,12 +18,13 @@ logger = logging.getLogger("sigtva.prototipos")
 class ServicioPrototipos:
     """CONTROL Prototype: pide copias al registro, nunca construye a mano."""
 
-    def __init__(self, registro: RegistroPrototipos = None, secuenciador: SecuenciadorGuia = None):
+    def __init__(self, registro: RegistroPrototipos = None,
+                 secuenciador: SecuenciadorGuia = None):
         self._registro = registro or RegistroPrototipos()
         self._secuenciador = secuenciador or SecuenciadorGuia()
 
     def sembrar_plantillas(self, remitente: str, servicio: str = "estandar") -> list:
-        """Guarda la guía base, la tula estándar y la remesa corporativa. Una sola vez."""
+        """Guarda guía base, tula estándar y remesa corporativa. Una sola vez."""
         self._registro.registrar("guia_base", Guia("BASE", remitente, servicio))
         self._registro.registrar("tula_estandar", Tula("BASE", "DESTINO"))
         self._registro.registrar("remesa_corporativa", Remesa("BASE", remitente))
@@ -52,5 +53,5 @@ class ServicioPrototipos:
             tulas.append(tula)
             logger.info("[Prototype] Guía %s -> %s (precinto %s)",
                         guia.numero, destino, tula.precinto)
-        logger.info("[Prototype] Remesa %s radicada con %d guías", remesa.numero, len(tulas))
+        logger.info("[Prototype] Remesa %s lista (%d guías)", remesa.numero, len(tulas))
         return {"remesa": remesa, "tulas": tulas, "guias": list(remesa.guias)}
