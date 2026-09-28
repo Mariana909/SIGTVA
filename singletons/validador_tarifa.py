@@ -49,15 +49,23 @@ class ValidadorTarifaEspecial:
                         soporte, valido, self._consultas)
             return valido
 
+    @staticmethod
+    def _edad(soporte: str) -> int:
+        """Edad del soporte o -1 si viene malformado (nunca revienta: lo inválido niega)."""
+        try:
+            return int(soporte.split(":")[1])
+        except (IndexError, ValueError):
+            return -1
+
     def _regla(self, tipo_tarifa: str, soporte: str) -> bool:
         if tipo_tarifa == "ordinaria":
             return True
         if tipo_tarifa == "estudiante":
             return soporte.startswith("CARNE-")
         if tipo_tarifa == "adulto_mayor":
-            return soporte.startswith("EDAD:") and int(soporte.split(":")[1]) >= 60
+            return self._edad(soporte) >= 60
         if tipo_tarifa == "infante":
-            return soporte.startswith("EDAD:") and int(soporte.split(":")[1]) < 12
+            return 0 <= self._edad(soporte) < 12
         return False
 
     def limpiar(self) -> None:

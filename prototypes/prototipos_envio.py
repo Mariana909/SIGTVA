@@ -105,14 +105,15 @@ class RegistroPrototipos:
         return cls._instancia
 
     def registrar(self, clave: str, prototipo: PrototipoGuia) -> None:
-        self._plantillas[clave] = prototipo
+        with self._candado:
+            self._plantillas[clave] = prototipo
         logger.info("[Prototype] Plantilla registrada: '%s' -> %s",
                     clave, type(prototipo).__name__)
 
     def clonar(self, clave: str) -> PrototipoGuia:
-        try:
-            prototipo = self._plantillas[clave]
-        except KeyError:
+        with self._candado:
+            prototipo = self._plantillas.get(clave)
+        if prototipo is None:
             raise ValueError(f"No hay plantilla registrada con la clave '{clave}'.")
         return prototipo.clonar()
 
