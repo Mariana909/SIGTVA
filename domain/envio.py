@@ -6,7 +6,6 @@ nada que ver con las tablas de SQLAlchemy (esas viven en /models).
 """
 import re
 from dataclasses import dataclass
-from typing import Optional
 
 # cm³ por kg. Equivale a 400 kg/m³, referencia habitual del transporte terrestre de carga.
 FACTOR_VOLUMETRICO = 2500
@@ -52,6 +51,6 @@ class Envio:
     valorFlete: float = 0.0
     tipoServicio: str = ""
     estado: str = "Registrado"
-    guia: Optional[Guia] = None
-    ruta: Optional[Ruta] = None
-    cliente: Optional[Cliente] = None
+    guia: Guia | None = None
+    ruta: Ruta | None = None
+    cliente: Cliente | None = None

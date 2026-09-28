@@ -139,7 +139,7 @@ def crear_viaje():
             return redirect(url_for('crear_viaje'))
         ViajeDAO.registrarViaje(
             origen=request.form.get('origen'), destino=request.form.get('destino'),
-            fecha_salida=datetime.datetime.now(), id_bus=buses[0].id_bus)
+            fecha_salida=datetime.datetime.now(tz=datetime.UTC), id_bus=buses[0].id_bus)
         flash("Viaje programado correctamente.", "success")
         return redirect(url_for('pasajeros'))
     return render_template('crear_viaje.html')

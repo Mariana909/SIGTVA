@@ -33,7 +33,7 @@ class ValidadorTarifaEspecial:
         return cls._instancia
 
     @classmethod
-    def obtenerInstancia(cls) -> "ValidadorTarifaEspecial":  # noqa: N802 - nombre UML/diagrama
+    def obtenerInstancia(cls) -> "ValidadorTarifaEspecial":
         return cls()
 
     def validar(self, tipo_tarifa: str, soporte: str) -> bool:

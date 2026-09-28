@@ -13,7 +13,6 @@ El cliente (ServicioRegistroEnvio) vive en /services y solo conoce las interface
 import logging
 import uuid
 from abc import ABC, abstractmethod
-from typing import List
 
 from domain.envio import Envio, Guia, calcularPesoFacturable
 
@@ -43,7 +42,7 @@ class GeneradorGuia(ABC):
         """Una guía individual."""
 
     @abstractmethod
-    def generarLote(self, n: int, base: int) -> List[Guia]:
+    def generarLote(self, n: int, base: int) -> list[Guia]:
         """n guías consecutivas a partir del consecutivo base."""
 
 
@@ -65,7 +64,7 @@ def _guia(prefijo: str, consecutivo: str) -> Guia:
     return Guia(numero=numero, codigoBarras=f"*{numero}*")
 
 
-def _lote(prefijo: str, n: int, base: int) -> List[Guia]:
+def _lote(prefijo: str, n: int, base: int) -> list[Guia]:
     if n <= 0:
         raise ValueError("El lote debe tener al menos una guía.")
     return [_guia(prefijo, f"{base + i:08d}") for i in range(n)]
@@ -95,7 +94,7 @@ class GuiaPaqueteo(GeneradorGuia):
     def generar(self, datos: dict) -> Guia:
         return _guia("PAQ", uuid.uuid4().hex[:8].upper())
 
-    def generarLote(self, n: int, base: int) -> List[Guia]:
+    def generarLote(self, n: int, base: int) -> list[Guia]:
         return _lote("PAQ", n, base)
 
 
@@ -133,7 +132,7 @@ class GuiaCorporativa(GeneradorGuia):
     def generar(self, datos: dict) -> Guia:
         return _guia("CORP", uuid.uuid4().hex[:8].upper())
 
-    def generarLote(self, n: int, base: int) -> List[Guia]:
+    def generarLote(self, n: int, base: int) -> list[Guia]:
         return _lote("CORP", n, base)
 
 
@@ -172,7 +171,7 @@ class GuiaRemesa(GeneradorGuia):
     def generar(self, datos: dict) -> Guia:
         return _guia("REM", uuid.uuid4().hex[:8].upper())
 
-    def generarLote(self, n: int, base: int) -> List[Guia]:
+    def generarLote(self, n: int, base: int) -> list[Guia]:
         return _lote("REM", n, base)
 
 

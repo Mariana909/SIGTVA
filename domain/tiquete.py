@@ -4,7 +4,6 @@ Objetos de dominio del proceso «Venta de tiquete».
 Son las partes y el producto que el patrón Builder ensambla paso a paso.
 """
 from dataclasses import dataclass
-from typing import Optional
 
 from factories.fabrica_tarifa import Tarifa
 
@@ -46,9 +45,9 @@ class Tiquete:
     fechaVenta: str = ""
     estado: str = "En construcción"
     valorFinal: float = 0.0
-    viaje: Optional[Viaje] = None
-    silla: Optional[Silla] = None
-    pasajero: Optional[Pasajero] = None
-    pago: Optional[Pago] = None
-    factura: Optional[Factura] = None
-    tarifa: Optional[Tarifa] = None
+    viaje: Viaje | None = None
+    silla: Silla | None = None
+    pasajero: Pasajero | None = None
+    pago: Pago | None = None
+    factura: Factura | None = None
+    tarifa: Tarifa | None = None

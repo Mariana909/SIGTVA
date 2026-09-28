@@ -27,7 +27,7 @@ def cargar_datos_demo() -> None:
         BusDAO.registrarBus("BUS-02", "DEF456", "Preferencial Plus", 30, 500.0),
         BusDAO.registrarBus("BUS-03", "GHI789", "Clásico", 30, 500.0),
     ]
-    manana = datetime.datetime.now() + datetime.timedelta(days=1)
+    manana = datetime.datetime.now(tz=datetime.UTC) + datetime.timedelta(days=1)
     for i, (origen, destino) in enumerate(RUTAS):
         # La primera ruta sale 3 veces; las demás una sola vez.
         horas = HORAS if i == 0 else (HORAS[i % 3],)

@@ -37,7 +37,7 @@ class GestorBloqueoSillas:
         return cls._instancia
 
     @classmethod
-    def obtenerInstancia(cls) -> "GestorBloqueoSillas":  # noqa: N802 - nombre UML/diagrama
+    def obtenerInstancia(cls) -> "GestorBloqueoSillas":
         """Punto global de acceso (equivalente UML a getInstancia())."""
         return cls()
 

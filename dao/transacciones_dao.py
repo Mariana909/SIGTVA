@@ -34,7 +34,7 @@ class TiqueteDAO:
             db.session.add(tiquete)
             db.session.commit()
             return True, "Tiquete registrado exitosamente.", tiquete
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001 - contrato DAO: rollback siempre + tupla (ok, msg)
             db.session.rollback()
             return False, f"Error al registrar tiquete: {e!s}", None
 
@@ -76,7 +76,7 @@ class EnvioDAO:
             db.session.add(nuevo_envio)
             db.session.commit()
             return True, "Envío registrado exitosamente.", nuevo_envio
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001 - contrato DAO: rollback siempre + tupla (ok, msg)
             db.session.rollback()
             return False, f"Error al registrar envío: {e!s}", None
 
@@ -94,7 +94,7 @@ class FacturaDAO:
             cufe = cufe or uuid.uuid4().hex
             factura = FacturaModel(
                 cufe=cufe,
-                fecha_emision=datetime.datetime.now(),
+                fecha_emision=datetime.datetime.now(tz=datetime.UTC),
                 id_tiquete=id_tiquete,
                 id_envio=id_envio,
                 monto_total=monto_total,
@@ -103,7 +103,7 @@ class FacturaDAO:
             db.session.add(factura)
             db.session.commit()
             return True, "Factura emitida correctamente.", factura
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001 - contrato DAO: rollback siempre + tupla (ok, msg)
             db.session.rollback()
             return False, f"Error en facturación: {e!s}", None
 

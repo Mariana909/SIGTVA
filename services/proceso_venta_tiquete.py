@@ -7,6 +7,7 @@ Aquí trabajan JUNTOS dos patrones:
 Después se persiste con los DAO.
 """
 import logging
+from typing import ClassVar
 
 from builders.constructor_tiquete import ConstructorTiqueteImpl, Taquillero
 from dao.entidades_base_dao import ClienteDAO
@@ -27,7 +28,7 @@ class ProcesoVentaTiquete:
     PRECIO_BASE = 85000.0  # Precio de lista por pasajero (lo fija el servidor, no el formulario).
 
     # Selección del creador de tarifa según lo elegido en pantalla.
-    FABRICAS_TARIFA = {
+    FABRICAS_TARIFA: ClassVar[dict] = {
         "ordinaria": FabricaTarifaOrdinaria,
         "estudiante": FabricaTarifaEstudiante,
         "adulto_mayor": FabricaTarifaAdultoMayor,

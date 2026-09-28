@@ -4,6 +4,8 @@ Capa de LÓGICA — caso de uso «Registrar envío».
 Orquesta el patrón Abstract Factory (ServicioRegistroEnvio) y la capa de datos
 (DAO). Las rutas de Flask solo llaman a este proceso.
 """
+from typing import ClassVar
+
 from dao.entidades_base_dao import ClienteDAO
 from dao.transacciones_dao import EnvioDAO, FacturaDAO
 from factories.fabrica_envio import FabricaCorporativa, FabricaPaqueteo, FabricaRemesa
@@ -13,7 +15,7 @@ from services.traza import CapturaTraza
 
 class ProcesoRegistroEnvio:
     # Selección de la familia según la modalidad elegida en pantalla.
-    FABRICAS = {
+    FABRICAS: ClassVar[dict] = {
         "paqueteo": FabricaPaqueteo,
         "corporativa": FabricaCorporativa,
         "remesa": FabricaRemesa,
