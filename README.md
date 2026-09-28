@@ -48,5 +48,4 @@ python -m ruff check .   # limpio: imports ordenados, sin excepciones ciegas,
                          # datetimes con zona, anotaciones modernas
 ```
 
-Convenciones: español en código y diagramas, tipos con `X | None` (Python 3.11+),
-nombres UML en camelCase igual que en los diagramas de clase.
+
