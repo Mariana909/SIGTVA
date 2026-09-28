@@ -1,127 +1,121 @@
+"""
+PATRÓN: BUILDER
+PROCESO: Venta de tiquete
+
+Roles del patrón
+  Director ............. Taquillero            (ordena los pasos)
+  Constructor .......... ConstructorTiquete    (interfaz con los pasos)
+  ConstructorConcreto .. ConstructorTiqueteImpl (acumula el tiquete)
+  Producto y partes .... Tiquete (+ Viaje, Silla, Pasajero, Pago, Factura) -> /domain
+  Colaboración ......... Tarifa llega creada por FabricaTarifa (Factory Method)
+"""
+import datetime
+import hashlib
+import uuid
 from abc import ABC, abstractmethod
-from factories.fabrica_venta import FabricaVenta
-from typing import Optional
 
-# --- PARTES DEL PRODUCTO ---
-class Viaje:
-    def __init__(self, origen: str, destino: str):
-        self.origen = origen
-        self.destino = destino
+from domain.tiquete import Tiquete, Viaje, Silla, Pasajero, Pago, Factura
+from factories.fabrica_tarifa import Tarifa
 
-class Silla:
-    def __init__(self, numero: int, estado: str = "Bloqueada"):
-        self.numero = numero
-        self.estado = estado
 
-class Pasajero:
-    def __init__(self, documento: str, nombre: str):
-        self.documento = documento
-        self.nombre = nombre
-
-class Pago:
-    def __init__(self, metodo: str, valor: float):
-        self.metodo = metodo
-        self.valor = valor
-
-class Factura:
-    def __init__(self, cufe: str, total: float):
-        self.cufe = cufe
-        self.total = total
-
-# --- PRODUCTO COMPLEJO ---
-class Tiquete:
-    def __init__(self):
-        self.numero: str = ""
-        self.fechaVenta: str = ""
-        self.estado: str = "Emitido"
-        self.valorFinal: float = 0.0
-        self.viaje: Optional[Viaje] = None
-        self.silla: Optional[Silla] = None
-        self.pasajero: Optional[Pasajero] = None
-        self.pago: Optional[Pago] = None
-        self.factura: Optional[Factura] = None
-
-# --- CONSTRUCTOR INTERFAZ ---
+# ═══════════════════════ CONSTRUCTOR (INTERFAZ) ═══════════════════════
 class ConstructorTiquete(ABC):
     @abstractmethod
-    def fijarViaje(self, v: Viaje) -> None: pass
-    
+    def fijarViaje(self, v: Viaje) -> None: ...
+
     @abstractmethod
-    def bloquearSilla(self, s: Silla) -> None: pass
-    
+    def bloquearSilla(self, s: Silla) -> None: ...
+
     @abstractmethod
-    def fijarPasajero(self, p: Pasajero) -> None: pass
-    
+    def fijarPasajero(self, p: Pasajero) -> None: ...
+
     @abstractmethod
-    def fijarTarifa(self, t: float) -> None: pass
-    
+    def fijarTarifa(self, t: Tarifa) -> None: ...
+
     @abstractmethod
-    def fijarPago(self, pago: Pago) -> None: pass
-    
+    def fijarPago(self, pago: Pago) -> None: ...
+
     @abstractmethod
-    def emitirFactura(self) -> None: pass
-    
+    def emitirFactura(self) -> None: ...
+
     @abstractmethod
-    def construir(self) -> Tiquete: pass
+    def construir(self) -> Tiquete: ...
 
 
-# --- CONSTRUCTOR CONCRETO ---
+# ═══════════════════════ CONSTRUCTOR CONCRETO ═══════════════════════
 class ConstructorTiqueteImpl(ConstructorTiquete):
-    def __init__(self, fabrica_canal: FabricaVenta):
-        self.fabrica = fabrica_canal
+    """Acumula el tiquete paso a paso y solo entrega un producto completo."""
+
+    def __init__(self):
         self.reset()
 
-    def reset(self):
-        self._tiquete = Tiquete()
+    def reset(self) -> None:
+        self._tiquete = Tiquete(
+            numero=f"TQ-{uuid.uuid4().hex[:6].upper()}",
+            fechaVenta=datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
+        )
 
     def fijarViaje(self, v: Viaje) -> None:
         self._tiquete.viaje = v
 
     def bloquearSilla(self, s: Silla) -> None:
-        bloqueador = self.fabrica.crearBloqueo()
-        if bloqueador.bloquear(str(s.numero)):
-            self._tiquete.silla = s
+        if s.numero <= 0:
+            raise ValueError("Número de silla inválido.")
+        s.estado = "Bloqueada"
+        self._tiquete.silla = s
 
     def fijarPasajero(self, p: Pasajero) -> None:
+        if not p.documento or not p.nombre:
+            raise ValueError("El pasajero requiere documento y nombre.")
         self._tiquete.pasajero = p
 
-    def fijarTarifa(self, t: float) -> None:
-        self._tiquete.valorFinal = t
+    def fijarTarifa(self, t: Tarifa) -> None:
+        self._tiquete.tarifa = t
+        self._tiquete.valorFinal = t.calcular()
 
     def fijarPago(self, pago: Pago) -> None:
-        validador = self.fabrica.crearPago()
-        if validador.validar({"metodo": pago.metodo, "valor": pago.valor}):
-            self._tiquete.pago = pago
+        if self._tiquete.tarifa is None:
+            raise ValueError("Debe fijar la tarifa antes del pago.")
+        if abs(pago.valor - self._tiquete.valorFinal) > 0.01:
+            raise ValueError("El valor del pago no coincide con el valor final del tiquete.")
+        self._tiquete.pago = pago
 
     def emitirFactura(self) -> None:
-        emisor = self.fabrica.crearFactura()
-        factura_data = emisor.emitir({"valorFinal": self._tiquete.valorFinal})
-        self._tiquete.factura = Factura(cufe=factura_data["cufe"], total=factura_data["total"])
+        if self._tiquete.pago is None:
+            raise ValueError("Debe registrar el pago antes de emitir la factura.")
+        t = self._tiquete
+        huella = f"{t.numero}|{t.fechaVenta}|{t.pago.valor}"
+        cufe = hashlib.sha384(huella.encode()).hexdigest()  # simula el CUFE de la factura electrónica
+        t.factura = Factura(cufe=cufe, total=t.pago.valor)
 
     def construir(self) -> Tiquete:
-        import uuid, datetime
-        self._tiquete.numero = f"TQ-{uuid.uuid4().hex[:6].upper()}"
-        self._tiquete.fechaVenta = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
-        
-        # Generar aviso mediante la fábrica
-        notificador = self.fabrica.crearAviso()
-        notificador.avisar({"numero": self._tiquete.numero})
-        
-        resultado = self._tiquete
-        self.reset()
-        return resultado
+        t = self._tiquete
+        faltantes = [nombre for nombre, parte in (
+            ("viaje", t.viaje), ("silla", t.silla), ("pasajero", t.pasajero),
+            ("tarifa", t.tarifa), ("pago", t.pago), ("factura", t.factura),
+        ) if parte is None]
+        if faltantes:
+            raise ValueError(f"Tiquete incompleto, faltan: {', '.join(faltantes)}.")
+        t.estado = "Emitido"
+        t.silla.estado = "Ocupada"
+        self.reset()  # el constructor queda listo para el siguiente tiquete
+        return t
 
 
-# --- DIRECTOR ---
+# ═══════════════════════ DIRECTOR ═══════════════════════
 class Taquillero:
-    def __init__(self, constructor: ConstructorTiquete):
-        self.builder = constructor
+    """Conoce el ORDEN de la venta; no sabe cómo se construye cada parte."""
 
-    def venderTiquete(self, viaje: Viaje, silla: Silla, pasajero: Pasajero, pago: Pago, tarifa: float) -> Tiquete:
-        self.builder.fijarViaje(viaje)
-        self.builder.bloquearSilla(silla)
-        self.builder.fijarPasajero(pasajero)
-        self.builder.fijarTarifa(tarifa)
-        self.builder.fijarPago(pago)
-        self.builder.emitirFactura()
-        return self.builder.construir()
+    def __init__(self, constructor: ConstructorTiquete):
+        self._constructor = constructor
+
+    def venderTiquete(self, viaje: Viaje, silla: Silla, pasajero: Pasajero,
+                      tarifa: Tarifa, metodoPago: str) -> Tiquete:
+        c = self._constructor
+        c.fijarViaje(viaje)
+        c.bloquearSilla(silla)
+        c.fijarPasajero(pasajero)
+        c.fijarTarifa(tarifa)
+        c.fijarPago(Pago(metodo=metodoPago, valor=tarifa.calcular()))
+        c.emitirFactura()
+        return c.construir()
