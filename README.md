@@ -48,4 +48,34 @@ python -m ruff check .   # limpio: imports ordenados, sin excepciones ciegas,
                          # datetimes con zona, anotaciones modernas
 ```
 
+## Pantallazos solicitados (12)
+
+Carpeta: `docs/pantallazos/` — ver directo en `main`.
+
+1. Arranque — `docs/pantallazos/01_arranque.png`
+2. Inicio — `docs/pantallazos/02_inicio.png`
+3. Consola Factory Method — `docs/pantallazos/03_consola_factory_method.png`
+4. Selección de tarifa en la web — `docs/pantallazos/04_seleccion_tarifa_web.png`
+5. Consola Abstract Factory — `docs/pantallazos/05_consola_abstract_factory.png`
+6. Formulario de registro de envío — `docs/pantallazos/06_formulario_envio.png`
+7. Factura del envío con el panel — `docs/pantallazos/07_factura_envio_panel.png`
+8. Regla de la familia en la web — `docs/pantallazos/08_regla_familia_web.png`
+9. Demo por consola de Builder — `docs/pantallazos/09_consola_builder.png`
+10. Compra de tiquete en la web — `docs/pantallazos/10_compra_tiquete_web.png`
+11. Demo por consola de Prototype — `docs/pantallazos/11_consola_prototype.png`
+12. Demo por consola de Singleton — `docs/pantallazos/12_consola_singleton.png`
+
+![01 arranque](docs/pantallazos/01_arranque.png)
+![02 inicio](docs/pantallazos/02_inicio.png)
+![03 consola factory](docs/pantallazos/03_consola_factory_method.png)
+![04 tarifa web](docs/pantallazos/04_seleccion_tarifa_web.png)
+![05 consola abstract](docs/pantallazos/05_consola_abstract_factory.png)
+![06 formulario envio](docs/pantallazos/06_formulario_envio.png)
+![07 factura envio](docs/pantallazos/07_factura_envio_panel.png)
+![08 regla familia](docs/pantallazos/08_regla_familia_web.png)
+![09 consola builder](docs/pantallazos/09_consola_builder.png)
+![10 compra tiquete](docs/pantallazos/10_compra_tiquete_web.png)
+![11 consola prototype](docs/pantallazos/11_consola_prototype.png)
+![12 consola singleton](docs/pantallazos/12_consola_singleton.png)
+
 
