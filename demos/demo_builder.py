@@ -8,6 +8,7 @@ conoce el orden; el constructor concreto acumula las partes y solo entrega un
 producto COMPLETO. La Tarifa llega ya creada por su fábrica (Factory Method).
 """
 from _comun import seccion, titulo
+
 from builders.constructor_tiquete import ConstructorTiqueteImpl, Taquillero
 from domain.tiquete import Pago, Pasajero, Silla, Viaje
 from factories.fabrica_tarifa import FabricaTarifaEstudiante, FabricaTarifaOrdinaria

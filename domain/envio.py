@@ -6,6 +6,10 @@ nada que ver con las tablas de SQLAlchemy (esas viven en /models).
 """
 import re
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from mementos.recuerdos import InstantaneaEnvio
 
 # cm³ por kg. Equivale a 400 kg/m³, referencia habitual del transporte terrestre de carga.
 FACTOR_VOLUMETRICO = 2500
@@ -45,7 +49,12 @@ class Cliente:
 
 @dataclass
 class Envio:
-    """Producto final. La guía es composición: nace y muere con el envío."""
+    """Producto final y Originador del patrón Memento.
+
+    La guía es composición: nace y muere con el envío. Como originador,
+    captura su propio estado con crearRecuerdo() y lo restaura con
+    restaurar() sin exponer sus campos.
+    """
     pesoFacturable: float = 0.0
     valorDeclarado: float = 0.0
     valorFlete: float = 0.0
@@ -54,3 +63,17 @@ class Envio:
     guia: Guia | None = None
     ruta: Ruta | None = None
     cliente: Cliente | None = None
+
+    def crearRecuerdo(self) -> "InstantaneaEnvio":
+        """Captura estado, peso, valor y tipo de servicio en una instantánea."""
+        from mementos.recuerdos import InstantaneaEnvio
+
+        return InstantaneaEnvio(self.estado, self.pesoFacturable,
+                                self.valorDeclarado, self.tipoServicio)
+
+    def restaurar(self, r: "InstantaneaEnvio") -> None:
+        """Repone los campos capturados en la instantánea."""
+        self.estado = r.obtenerEstado()
+        self.pesoFacturable = r.obtenerPesoFacturable()
+        self.valorDeclarado = r.obtenerValorDeclarado()
+        self.tipoServicio = r.obtenerTipoServicio()

@@ -19,6 +19,10 @@ import copy
 import logging
 import threading
 from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from iterators.iteradores import IteradorEnvios
 
 logger = logging.getLogger("sigtva.prototipos")
 
@@ -71,12 +75,19 @@ class Remesa(PrototipoGuia):
     """Remesa corporativa: lote de guías de un mismo cliente.
 
     Copia PROFUNDA por la misma razón que Tula: el lote pertenece al clon.
+    Además es el AgregadoConcreto del patrón Iterator: crea IteradorGuia.
     """
 
     def __init__(self, numero: str, cliente: str):
         self.numero = numero
         self.cliente = cliente
-        self.guias: list = []
+        self.guias: list[Guia] = []
+
+    def crearIterador(self) -> "IteradorEnvios":
+        """Crea un iterador nuevo sobre las guías de esta remesa."""
+        from iterators.iteradores import IteradorGuia
+
+        return IteradorGuia(self)
 
     def clonar(self) -> "Remesa":
         clon = copy.deepcopy(self)

@@ -8,6 +8,7 @@ pide copias al RegistroPrototipos. Guia se clona superficial (solo valores);
 Tula y Remesa se clonan profundo (cada clon trae su propia lista).
 """
 from _comun import seccion, titulo
+
 from prototypes.prototipos_envio import RegistroPrototipos
 from services.servicio_prototipos import ServicioPrototipos
 

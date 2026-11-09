@@ -8,6 +8,7 @@ Qué demuestra: el código cliente pide una tarifa a un CREADOR abstracto
 creador decide qué Tarifa fabricar en su factory method crearTarifa().
 """
 from _comun import seccion, titulo
+
 from factories.fabrica_tarifa import (
     FabricaTarifa,
     FabricaTarifaAdultoMayor,

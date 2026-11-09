@@ -8,6 +8,7 @@ envío usando solo interfaces. Al cambiar la fábrica cambia toda la familia de
 productos (flete, peso, guía, aviso, crédito) sin tocar el código del cliente.
 """
 from _comun import seccion, titulo
+
 from factories.fabrica_envio import FabricaCorporativa, FabricaPaqueteo, FabricaRemesa
 from services.servicio_registro_envio import ServicioRegistroEnvio
 
