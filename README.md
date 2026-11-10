@@ -9,15 +9,18 @@ Aplicación Flask en **tres capas** (MVC) que implementa un proceso por patrón:
 | **Builder** | Venta de tiquete | `builders/constructor_tiquete.py` |
 | **Prototype** | Registro de envío: remesa múltiple por clonación | `prototypes/prototipos_envio.py` — cliente: `services/servicio_prototipos.py` |
 | **Singleton** | Venta de tiquete: bloqueo, consecutivo y caché única | `singletons/` (gestor, secuenciadores, validador) |
+| **Iterator** | Despacho de remesa: recorrido de guías sin exponer la lista | `iterators/iteradores.py` — cliente: `services/servicio_despacho.py` |
+| **Memento** | Corrección de encomienda registrada: guardar y revertir | `mementos/recuerdos.py` — cliente: `services/servicio_memento.py` |
+| **State** | Seguimiento del envío: ciclo de vida y trazabilidad (RF-03, RF-04) | `states/estados_envio.py` — cliente: `domain/envio.py` |
 
-En la venta de tiquete los patrones **componen**: la `Tarifa` la crea el Factory Method y el Builder la recibe ya creada; en el registro de envío, cada guía clonada por Prototype se numera con el SecuenciadorGuia (Singleton).
+En la venta de tiquete los patrones **componen**: la `Tarifa` la crea el Factory Method y el Builder la recibe ya creada; en el registro de envío, cada guía clonada por Prototype se numera con el SecuenciadorGuia (Singleton). Iterator y Memento se aplican sobre `Envio` y `Remesa` (Prototype), y State controla todo el ciclo de vida del envío desde que se crea en el estado *Recibido en Origen* hasta *Entregado* o *Abandonado*.
 
 ## Capas
 
 | Capa | Carpetas / archivos |
 |---|---|
 | Presentación (vista + controlador) | `app.py`, `templates/` |
-| Lógica de negocio | `services/`, `factories/`, `builders/`, `prototypes/`, `singletons/`, `domain/` |
+| Lógica de negocio | `services/`, `factories/`, `builders/`, `prototypes/`, `singletons/`, `iterators/`, `mementos/`, `states/`, `domain/` |
 | Datos | `dao/`, `models/` |
 
 Regla de dependencias: datos solo usa datos; lógica usa lógica y datos; presentación usa lógica (los procesos) y, en tres rutas de consulta, datos directamente.
@@ -29,7 +32,7 @@ pip install -r requirements.txt
 python app.py            # http://127.0.0.1:5000  (crea la BD y datos de prueba solos)
 ```
 
-Tras cada compra o envío, la factura muestra el panel **«Patrones en acción»** con los pasos reales de cada patrón.
+Tras cada compra o envío, la factura muestra el panel **"Patrones en acción"** con los pasos reales de cada patrón.
 
 ## Demos por consola (una por patrón)
 
@@ -39,6 +42,9 @@ python demos/demo_abstract_factory.py
 python demos/demo_builder.py
 python demos/demo_prototype.py
 python demos/demo_singleton.py
+python demos/demo_iterator.py
+python demos/demo_memento.py
+python demos/demo_state.py
 ```
 
 ## Calidad
@@ -48,7 +54,7 @@ python -m ruff check .   # limpio: imports ordenados, sin excepciones ciegas,
                          # datetimes con zona, anotaciones modernas
 ```
 
-## Pantallazos solicitados (12)
+## Pantallazos solicitados
 
 Carpeta: `docs/pantallazos/` — ver directo en `main`.
 
@@ -64,6 +70,9 @@ Carpeta: `docs/pantallazos/` — ver directo en `main`.
 10. Compra de tiquete en la web — `docs/pantallazos/10_compra_tiquete_web.png`
 11. Demo por consola de Prototype — `docs/pantallazos/11_consola_prototype.png`
 12. Demo por consola de Singleton — `docs/pantallazos/12_consola_singleton.png`
+13. Demo por consola de Iterator — `docs/pantallazos/13_consola_iterator.png`
+14. Demo por consola de Memento — `docs/pantallazos/14_consola_memento.png`
+15. Demo por consola de State — `docs/pantallazos/15_consola_state.png`
 
 ![01 arranque](docs/pantallazos/01_arranque.png)
 ![02 inicio](docs/pantallazos/02_inicio.png)
@@ -77,5 +86,6 @@ Carpeta: `docs/pantallazos/` — ver directo en `main`.
 ![10 compra tiquete](docs/pantallazos/10_compra_tiquete_web.png)
 ![11 consola prototype](docs/pantallazos/11_consola_prototype.png)
 ![12 consola singleton](docs/pantallazos/12_consola_singleton.png)
-
-
+![13 consola iterator](docs/pantallazos/13_consola_iterator.png)
+![14 consola memento](docs/pantallazos/14_consola_memento.png)
+![15 consola state](docs/pantallazos/15_consola_state.png)
